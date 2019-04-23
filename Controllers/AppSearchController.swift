@@ -16,7 +16,28 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
         super.viewDidLoad()
         collectionView.backgroundColor = .white
         collectionView.register(SearchResultsCell.self, forCellWithReuseIdentifier: cellId)
+        fetchItunesApps()
+        
     }
+    
+    fileprivate func fetchItunesApps() {
+        let urlString = "http://itunes.apple.com/search?term=instagram&entity=software"
+        guard let url = URL(string: urlString) else { return }
+        //fetch data
+        URLSession.shared.dataTask(with: url) { (data, resp, err) in
+            if let err = err {
+                print("Failed to fetch apps", err)
+                return
+            }
+            //success
+            print(data)
+            print(String(data: data!, encoding: .utf8))
+        }.resume()
+        
+    }
+    
+    
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return .init(width: view.frame.width, height: 300)
     }
@@ -25,9 +46,9 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
     }
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! SearchResultsCell
 
-
+        cell.nameLabel.text = "Alex"
         return cell
     }
     init() {
