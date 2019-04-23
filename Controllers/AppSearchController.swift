@@ -19,7 +19,11 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
         fetchItunesApps()
         
     }
-   
+    fileprivate var appResults = [Result]()
+    
+   // 1 - populate our cells with our itunes api data
+   // 2 - extract this function outside of controller
+    
     fileprivate func fetchItunesApps() {
         let urlString = "http://itunes.apple.com/search?term=instagram&entity=software"
         guard let url = URL(string: urlString) else { return }
@@ -33,7 +37,11 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
             do {
                 let searchResult = try JSONDecoder().decode(SearchResult.self, from:data)
                 
-                searchResult.results.forEach({print($0.trackName, $0.primaryGenreName)})
+                self.appResults = searchResult.results
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+                
             } catch let jsonErr {
                 print("failed to decode", jsonErr)
             }
@@ -49,13 +57,18 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
         return .init(width: view.frame.width, height: 300)
     }
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return appResults.count
     }
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! SearchResultsCell
 
-        cell.nameLabel.text = "Alex"
+        let appResult = appResults[indexPath.item]
+
+        cell.nameLabel.text = appResult.trackName
+        cell.categoryLabel.text = appResult.primaryGenreName
+        cell.ratingsLabel.text = "Rating: \(appResult.averageUserRating ?? 0)"
+
         return cell
     }
     init() {
