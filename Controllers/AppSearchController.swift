@@ -19,7 +19,7 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
         fetchItunesApps()
         
     }
-    
+   
     fileprivate func fetchItunesApps() {
         let urlString = "http://itunes.apple.com/search?term=instagram&entity=software"
         guard let url = URL(string: urlString) else { return }
@@ -29,9 +29,16 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
                 print("Failed to fetch apps", err)
                 return
             }
-            //success
-            print(data)
-            print(String(data: data!, encoding: .utf8))
+            guard let data = data else { return }
+            do {
+                let searchResult = try JSONDecoder().decode(SearchResult.self, from:data)
+                
+                searchResult.results.forEach({print($0.trackName, $0.primaryGenreName)})
+            } catch let jsonErr {
+                print("failed to decode", jsonErr)
+            }
+                
+       
         }.resume()
         
     }
