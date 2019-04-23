@@ -21,33 +21,19 @@ class AppSearchController: UICollectionViewController, UICollectionViewDelegateF
     }
     fileprivate var appResults = [Result]()
     
-   // 1 - populate our cells with our itunes api data
-   // 2 - extract this function outside of controller
-    
     fileprivate func fetchItunesApps() {
-        let urlString = "http://itunes.apple.com/search?term=instagram&entity=software"
-        guard let url = URL(string: urlString) else { return }
-        //fetch data
-        URLSession.shared.dataTask(with: url) { (data, resp, err) in
+        Service.shared.fetchApps { (results, err) in
+            
             if let err = err {
-                print("Failed to fetch apps", err)
+                print("failed to fetch", err)
                 return
             }
-            guard let data = data else { return }
-            do {
-                let searchResult = try JSONDecoder().decode(SearchResult.self, from:data)
-                
-                self.appResults = searchResult.results
+            self.appResults = results
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
                 }
-                
-            } catch let jsonErr {
-                print("failed to decode", jsonErr)
             }
-                
-       
-        }.resume()
+        
         
     }
     
