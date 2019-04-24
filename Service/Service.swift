@@ -9,12 +9,24 @@
 import Foundation
 
 class Service {
+//    let newSearchTerm = searchTerm.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
     
     static let shared = Service() // singleton
+   
     
-    func fetchApps(completion: @escaping ([Result], Error?) -> () ) {
+    func fetchApps(searchTerm: String, completion: @escaping ([Result], Error?) -> () ) {
+    
         print("fetching itunes apps from Service layer")
-        let urlString = "http://itunes.apple.com/search?term=instagram&entity=software"
+     
+        if let urlWithPercentEscapes = searchTerm.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) {
+            print(urlWithPercentEscapes)
+            
+            
+        }
+        let urlString = "http://itunes.apple.com/search?term=\(searchTerm)&entity=software"
+
+     
+        
         guard let url = URL(string: urlString) else { return }
       
         //fetch data
